@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+   >
+
+>
+    <ScrollView
+        android:layout_height="400dp"
+        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:fillViewport="true"
+        android:layout_weight="1">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/linearlayoutdesc"
+            android:paddingTop="10dp"
+            android:weightSum="1">
+
+            <ImageView
+
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/persona2"
+                android:id="@+id/ivdescripcion"
+                android:layout_weight="0.52" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvdescripcion2"/>
+
+
+
+
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        >
+
+        <EditText
+        android:layout_width="249dp"
+        android:layout_height="match_parent"
+            android:layout_weight="0.7"
+            android:id="@+id/etrespuesta"
+            android:background="@drawable/backwithborder"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enviar"
+            android:id="@+id/btnenviar"
+            android:layout_weight="0.3"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>
+
+

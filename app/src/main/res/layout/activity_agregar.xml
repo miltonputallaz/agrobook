@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:fab="http://schemas.android.com/apk/res-auto"
+
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_agregar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.putallazmilton.agrobook2.views.agregarActivity"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:id="@+id/imageview"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:hint="Ingrese descripcion"
+                android:gravity="top"
+                android:id="@+id/etdescripcion"/>
+
+
+
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirmar"
+                android:id="@+id/btnconfirmar"
+                android:elevation="0dp"
+                android:layout_gravity="bottom"
+
+                />
+
+        </LinearLayout>
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/menu_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+
+            fab:fab_addButtonColorNormal="?attr/colorAccent"
+            fab:fab_addButtonSize="normal"
+            fab:fab_labelStyle="@style/Etiquetas"
+            fab:fab_labelsPosition="left"
+            android:layout_marginBottom="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            fab:fab_icon="@mipmap/ic_add_a_photo_white_24dp">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_camara"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                fab:fab_colorNormal="?attr/colorAccent"
+                fab:fab_icon="@mipmap/ic_camera_black_24dp"
+                fab:fab_size="mini"
+                />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_galeria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                fab:fab_colorNormal="?attr/colorAccent"
+                fab:fab_icon="@mipmap/ic_collections_black_24dp"
+                fab:fab_size="mini"
+                />
+
+
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    </RelativeLayout>
+

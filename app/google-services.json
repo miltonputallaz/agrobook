@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "147842973937",
+    "firebase_url": "https://apirestandroid.firebaseio.com",
+    "project_id": "apirestandroid",
+    "storage_bucket": "apirestandroid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147842973937:android:91da6d0502fb1f6c",
+        "android_client_info": {
+          "package_name": "com.putallazmilton.agrobook2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147842973937-71nu48utkulvrufc9h5043g2tdgka5ik.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.putallazmilton.agrobook2",
+            "certificate_hash": "9930A2D316A1F1B8B96101C1C14F6E6DAF4D4F1E"
+          }
+        },
+        {
+          "client_id": "147842973937-a3il1t3c3q9lllme05re8317j4f3migd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvr8BsH3Xr7yZruLsuMj0jm6FmOL3PyKs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "147842973937-a3il1t3c3q9lllme05re8317j4f3migd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
