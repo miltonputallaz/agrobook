@@ -94,6 +94,8 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
         requestQueue.add(jsArrayRequest);
     }
 
+
+
     @Override
     public PictureViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
@@ -137,6 +139,10 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
         return problemas1;
     }
 
+    public void nuevoProblema(Problema problema){
+        this.problemas.add(problema);
+        this.notifyDataSetChanged();
+    }
     @Override
     public void onBindViewHolder(PictureViewHolder holder, final int position) {
         final Problema problema = problemas.get(position);

@@ -1,21 +1,14 @@
 package com.putallazmilton.agrobook2.views;
 
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.shapes.Shape;
-import android.media.Image;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,9 +17,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.putallazmilton.agrobook2.R;
 import com.putallazmilton.agrobook2.adapters.homeAdapter;
-import com.putallazmilton.agrobook2.adapters.respuestasAdapter;
 import com.putallazmilton.agrobook2.models.Problema;
 import com.putallazmilton.agrobook2.models.Respuesta;
 import com.squareup.picasso.Picasso;
@@ -35,18 +30,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import static com.android.volley.Request.Method.GET;
 import static com.android.volley.Request.Method.POST;
-import static com.putallazmilton.agrobook2.R.layout.item;
 
 public class descripcionActivity extends AppCompatActivity {
     ArrayList<Respuesta> respuestas = new ArrayList<>();
 
 
-
+    private Socket mSocket;
     LinearLayout ll;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +53,12 @@ public class descripcionActivity extends AppCompatActivity {
         final Problema problema= (Problema) extras.get("problema");
         Button botonenv=(Button) findViewById(R.id.btnenviar);
         final RequestQueue requestq= Volley.newRequestQueue(getApplicationContext());
+        try {
+            mSocket = IO.socket("http://192.168.1.2:8080");
+        } catch (URISyntaxException e) {}
 
+        mSocket.on("agregar_respuesta",onNewAnswer);
+        mSocket.connect();
         final EditText edrespuet =(EditText) findViewById(R.id.etrespuesta);
 
         ll=(LinearLayout) findViewById(R.id.linearlayoutdesc);
@@ -71,7 +71,7 @@ public class descripcionActivity extends AppCompatActivity {
                 Iterator i = respuestas.iterator();
                 while(i.hasNext()){
                     Respuesta respuesta =(Respuesta) i.next();
-                   
+
 
                     View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
                     TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
@@ -80,6 +80,7 @@ public class descripcionActivity extends AppCompatActivity {
                     tvdesc.setText(respuesta.getDescripcion());
 
                     ll.addView(vi);
+
 
                 }
             }
@@ -117,17 +118,34 @@ public class descripcionActivity extends AppCompatActivity {
                 JsonObjectRequest object= new JsonObjectRequest(POST,"http://192.168.1.2:8080/respuestas",json,new Response.Listener<JSONObject>(){
 
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(final JSONObject response) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(descripcionActivity.this);
-                        builder.setMessage("Su problema se ha publicado con exito!")
+                        builder.setMessage("Su respuesta se ha publicado con exito!")
                                 .setTitle("Exito!!")
                                 .setCancelable(false)
                                 .setNeutralButton("Aceptar",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 dialog.cancel();
-                                                finish();
-                                                startActivity(getIntent());
+                                                if (mSocket.connected()){
+                                                    mSocket.emit("nueva_respuesta",response);
+                                                }
+                                                JSONObject data= (JSONObject) response;
+                                                String usuario="";
+                                                String descripcion="";
+                                                try {
+                                                    usuario = data.getString("usuario");
+                                                    descripcion = data.getString("descripcion");
+                                                    View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
+                                                    TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
+                                                    tvusuario.setText(usuario);
+                                                    TextView tvdesc = (TextView) vi.findViewById(R.id.descripcionrespuesta);
+                                                    tvdesc.setText(descripcion);
+
+                                                    ll.addView(vi);
+                                                } catch (JSONException e) {
+                                                    Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
+                                                }
                                             }
                                         });
                         AlertDialog alert = builder.create();
@@ -149,6 +167,51 @@ public class descripcionActivity extends AppCompatActivity {
 
 
 
+    }
+
+
+    private Emitter.Listener onNewAnswer = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                 JSONObject data = (JSONObject) args[0];
+                    String usuario="";
+                    String descripcion="";
+                    try {
+                        usuario = data.getString("usuario");
+                        descripcion = data.getString("descripcion");
+                        View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
+                        TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
+                        tvusuario.setText(usuario);
+                        TextView tvdesc = (TextView) vi.findViewById(R.id.descripcionrespuesta);
+                        tvdesc.setText(descripcion);
+
+                        ll.addView(vi);
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
+                    }
+
+
+
+
+                }
+
+
+
+
+            });
+        }
+    };
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mSocket.disconnect();
+        mSocket.off("agregar_respuesta", onNewAnswer);
     }
 
     public ArrayList<Respuesta> parseJson(JSONObject jsonObject){

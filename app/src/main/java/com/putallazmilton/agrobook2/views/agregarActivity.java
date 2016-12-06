@@ -23,11 +23,19 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.putallazmilton.agrobook2.R;
+import com.putallazmilton.agrobook2.models.Problema;
 import com.putallazmilton.agrobook2.retrofit.RetrofitInterface;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -47,7 +55,7 @@ public class agregarActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     Bitmap bitmap;
     String PathImagen;
-
+    private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,12 @@ public class agregarActivity extends AppCompatActivity {
         FloatingActionButton fab_camara=(FloatingActionButton) findViewById(R.id.fab_camara);
 
 
+            try {
+                mSocket = IO.socket("http://192.168.1.2:8080");
+            } catch (URISyntaxException e) {}
+
+
+        mSocket.connect();
         final FloatingActionButton fab_galeria = (FloatingActionButton) findViewById(R.id.fab_galeria);
         Button btnconfirmar = (Button) findViewById(R.id.btnconfirmar);
 
@@ -84,7 +98,7 @@ public class agregarActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!(eddescripcion.getText().toString().trim().length()==0)) {
-                    if(!(PathImagen.toString().trim().length()==0)){
+                if(!(PathImagen.toString().trim().length()==0)){
 
                     final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                             .readTimeout(5, TimeUnit.MINUTES)
@@ -110,7 +124,7 @@ public class agregarActivity extends AppCompatActivity {
                     call.enqueue(new Callback<ResponseBody>() {
 
                         @Override
-                        public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                        public void onResponse(Call<ResponseBody> call, final retrofit2.Response<ResponseBody> response) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(agregarActivity.this);
                             builder.setMessage("Su problema se ha publicado con exito!")
                                     .setTitle("Exito!!")
@@ -119,6 +133,21 @@ public class agregarActivity extends AppCompatActivity {
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     dialog.cancel();
+
+                                                    if(mSocket.connected()){
+                                                        try {
+                                                            JSONObject object=new JSONObject(response.body().string());
+                                                            mSocket.emit("nuevo_problema",object);
+
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                    } else {
+                                                        Toast.makeText(getApplicationContext(), "No conectado a socket", Toast.LENGTH_LONG);
+                                                    }
                                                     Intent inte = new Intent(getApplicationContext(), MainActivity.class);
                                                     startActivity(inte);
                                                 }
@@ -133,9 +162,12 @@ public class agregarActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG);
                         }
                     });
-                } else {
+           } else {
                       Toast.makeText(getApplicationContext(),"Debe ingresar una imagen!",Toast.LENGTH_LONG).show();
                     }
+
+
+
                 } else {
                     Toast.makeText(getApplicationContext(),"Debe ingresar una descripcion!",Toast.LENGTH_LONG).show();
                 }
@@ -146,8 +178,13 @@ public class agregarActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        mSocket.disconnect();
 
+    }
 
     private void galleryIntent()
     {
