@@ -20,6 +20,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.putallazmilton.agrobook2.R;
 import com.putallazmilton.agrobook2.adapters.homeAdapter;
 import com.putallazmilton.agrobook2.models.Problema;
+import com.putallazmilton.agrobook2.socket.sockets;
 import com.putallazmilton.agrobook2.views.agregarActivity;
 
 
@@ -51,15 +52,6 @@ public class homeFragment extends Fragment {
         // Inflate the layout for this fragment
       View view =inflater.inflate(R.layout.fragment_home, container, false);
 
-            try {
-                mSocket = IO.socket("http://192.168.1.2:8080");
-            } catch (URISyntaxException e) {}
-
-        mSocket.on("agregar_problema", onNewProblem);
-        mSocket.connect();
-        if (mSocket.connected()){
-            Toast.makeText(getContext(),"Conectado a socket",Toast.LENGTH_LONG);
-        }
         rv= (RecyclerView) view.findViewById(R.id.recyclerviewhome);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
         FloatingActionButton fab= (FloatingActionButton) view.findViewById(R.id.floatbutton);
@@ -67,7 +59,7 @@ public class homeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),agregarActivity.class);
-                intent.putExtra("problemas",problemas);
+
                 startActivity(intent);
             }
         });
@@ -77,34 +69,18 @@ public class homeFragment extends Fragment {
 
         homeAdapter ha=new homeAdapter(R.layout.item,getActivity());
         rv.setAdapter(ha);
+
+        sockets.getInstance().setActivityhome(getActivity());
+        sockets.getInstance().setContexthome(getContext());
+        sockets.getInstance().setRv(rv);
         return view;
 
 
     }
 
-    private Emitter.Listener onNewProblem = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rv.setAdapter(new homeAdapter(R.layout.item,getActivity()));
-        }
 
 
 
-
-            });
-        }
-    };
-
- /*   @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off("agregar_problema", onNewProblem);
-    }*/
 
 
 

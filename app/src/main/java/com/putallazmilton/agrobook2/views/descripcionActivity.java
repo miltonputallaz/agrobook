@@ -24,6 +24,7 @@ import com.putallazmilton.agrobook2.R;
 import com.putallazmilton.agrobook2.adapters.homeAdapter;
 import com.putallazmilton.agrobook2.models.Problema;
 import com.putallazmilton.agrobook2.models.Respuesta;
+import com.putallazmilton.agrobook2.socket.sockets;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -39,7 +40,7 @@ import static com.android.volley.Request.Method.POST;
 
 public class descripcionActivity extends AppCompatActivity {
     ArrayList<Respuesta> respuestas = new ArrayList<>();
-
+    private String url="http://192.168.1.2:8080/";
 
     private Socket mSocket;
     LinearLayout ll;
@@ -53,18 +54,13 @@ public class descripcionActivity extends AppCompatActivity {
         final Problema problema= (Problema) extras.get("problema");
         Button botonenv=(Button) findViewById(R.id.btnenviar);
         final RequestQueue requestq= Volley.newRequestQueue(getApplicationContext());
-        try {
-            mSocket = IO.socket("http://192.168.1.2:8080");
-        } catch (URISyntaxException e) {}
 
-        mSocket.on("agregar_respuesta",onNewAnswer);
-        mSocket.connect();
         final EditText edrespuet =(EditText) findViewById(R.id.etrespuesta);
 
         ll=(LinearLayout) findViewById(R.id.linearlayoutdesc);
-        String url="http://192.168.1.2:8080/images/"+problema.getId()+".jpg";
-        Picasso.with(descripcionActivity.this).load(url).into(iv);
-        JsonObjectRequest joreq = new JsonObjectRequest(GET,"http://192.168.1.2:8080/respuestas/"+problema.getId(),(String)null, new Response.Listener<JSONObject>() {
+        final String urlretro=url+"images/"+problema.getId()+".jpg";
+        Picasso.with(descripcionActivity.this).load(urlretro).into(iv);
+        JsonObjectRequest joreq = new JsonObjectRequest(GET,url+"respuestas/"+problema.getId(),(String)null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 respuestas = parseJson(response);
@@ -115,7 +111,7 @@ public class descripcionActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                JsonObjectRequest object= new JsonObjectRequest(POST,"http://192.168.1.2:8080/respuestas",json,new Response.Listener<JSONObject>(){
+                JsonObjectRequest object= new JsonObjectRequest(POST,url+"respuestas",json,new Response.Listener<JSONObject>(){
 
                     @Override
                     public void onResponse(final JSONObject response) {
@@ -143,6 +139,7 @@ public class descripcionActivity extends AppCompatActivity {
                                                     tvdesc.setText(descripcion);
 
                                                     ll.addView(vi);
+                                                    edrespuet.setText("");
                                                 } catch (JSONException e) {
                                                     Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
                                                 }
@@ -163,6 +160,10 @@ public class descripcionActivity extends AppCompatActivity {
             }
         });
 
+        sockets.getInstance().setActivitydesc(this);
+        sockets.getInstance().setContextdesc(getApplicationContext());
+        sockets.getInstance().setLl(ll);
+        mSocket=sockets.getInstance().getmSocket();
 
 
 
@@ -170,49 +171,10 @@ public class descripcionActivity extends AppCompatActivity {
     }
 
 
-    private Emitter.Listener onNewAnswer = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                 JSONObject data = (JSONObject) args[0];
-                    String usuario="";
-                    String descripcion="";
-                    try {
-                        usuario = data.getString("usuario");
-                        descripcion = data.getString("descripcion");
-                        View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
-                        TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
-                        tvusuario.setText(usuario);
-                        TextView tvdesc = (TextView) vi.findViewById(R.id.descripcionrespuesta);
-                        tvdesc.setText(descripcion);
-
-                        ll.addView(vi);
-                    } catch (JSONException e) {
-                        Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
-                    }
 
 
 
 
-                }
-
-
-
-
-            });
-        }
-    };
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off("agregar_respuesta", onNewAnswer);
-    }
 
     public ArrayList<Respuesta> parseJson(JSONObject jsonObject){
         // Variables locales

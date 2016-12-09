@@ -141,7 +141,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
 
     public void nuevoProblema(Problema problema){
         this.problemas.add(problema);
-        this.notifyDataSetChanged();
+
     }
     @Override
     public void onBindViewHolder(PictureViewHolder holder, final int position) {

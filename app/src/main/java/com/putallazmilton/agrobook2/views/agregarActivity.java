@@ -29,6 +29,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.putallazmilton.agrobook2.R;
 import com.putallazmilton.agrobook2.models.Problema;
 import com.putallazmilton.agrobook2.retrofit.RetrofitInterface;
+import com.putallazmilton.agrobook2.socket.sockets;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public class agregarActivity extends AppCompatActivity {
     Bitmap bitmap;
     String PathImagen;
     private Socket mSocket;
-
+    private String url= "http://192.168.1.2:8080/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,12 +69,7 @@ public class agregarActivity extends AppCompatActivity {
         FloatingActionButton fab_camara=(FloatingActionButton) findViewById(R.id.fab_camara);
 
 
-            try {
-                mSocket = IO.socket("http://192.168.1.2:8080");
-            } catch (URISyntaxException e) {}
-
-
-        mSocket.connect();
+        mSocket= sockets.getInstance().getmSocket();
         final FloatingActionButton fab_galeria = (FloatingActionButton) findViewById(R.id.fab_galeria);
         Button btnconfirmar = (Button) findViewById(R.id.btnconfirmar);
 
@@ -105,7 +101,7 @@ public class agregarActivity extends AppCompatActivity {
                             .connectTimeout(5, TimeUnit.MINUTES)
                             .build();
                     Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl("http://192.168.1.2:8080/")
+                            .baseUrl(url)
                             .client(okHttpClient)
                             .build();
 
@@ -178,13 +174,6 @@ public class agregarActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mSocket.disconnect();
-
-    }
 
     private void galleryIntent()
     {
