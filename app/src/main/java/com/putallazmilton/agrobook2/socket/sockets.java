@@ -24,7 +24,7 @@ import java.net.URISyntaxException;
  * Created by Milton on 09/12/2016.
  */
 
-public class sockets {
+public class    sockets {
 
     private static sockets instanciaUnica;
     private Context contexthome;

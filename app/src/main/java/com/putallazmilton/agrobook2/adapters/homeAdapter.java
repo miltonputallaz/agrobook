@@ -120,7 +120,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
 
                     Problema problema = new Problema(
                             objeto.getString("descripcion"),
-                            "Milton",
+                            objeto.getString("usuario"),
                             objeto.getString("_id"));
 
 

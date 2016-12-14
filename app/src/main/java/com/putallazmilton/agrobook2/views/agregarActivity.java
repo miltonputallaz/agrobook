@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +23,9 @@ import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import com.github.nkzawa.socketio.client.IO;
@@ -52,11 +56,12 @@ public class agregarActivity extends AppCompatActivity {
 
     File photoFile = null;
     ImageView vi;
-
+    String user;
     private RequestQueue requestQueue;
     Bitmap bitmap;
     String PathImagen;
     private Socket mSocket;
+
     private String url= "http://192.168.1.2:8080/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,64 +105,86 @@ public class agregarActivity extends AppCompatActivity {
                             .readTimeout(5, TimeUnit.MINUTES)
                             .connectTimeout(5, TimeUnit.MINUTES)
                             .build();
-                    Retrofit retrofit = new Retrofit.Builder()
+                    final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(url)
                             .client(okHttpClient)
                             .build();
 
 
-                    RetrofitInterface service = retrofit.create(RetrofitInterface.class);
-                    File file = new File(PathImagen);
-                    RequestBody imagen = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-                    MultipartBody.Part body = MultipartBody.Part.createFormData("imagen", file.getName(), imagen);
-                    String des = eddescripcion.getText().toString();
-                    RequestBody descripcion = RequestBody.create(MediaType.parse("multipart/form-data"), des);
-                    String user = "Milton";
-                    RequestBody usuario = RequestBody.create(MediaType.parse("multipart/form-data"), user);
 
 
-                    Call<ResponseBody> call = service.upload(body, descripcion, usuario);
-                    call.enqueue(new Callback<ResponseBody>() {
 
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, final retrofit2.Response<ResponseBody> response) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(agregarActivity.this);
-                            builder.setMessage("Su problema se ha publicado con exito!")
-                                    .setTitle("Exito!!")
-                                    .setCancelable(false)
-                                    .setNeutralButton("Aceptar",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
 
-                                                    if(mSocket.connected()){
-                                                        try {
-                                                            JSONObject object=new JSONObject(response.body().string());
-                                                            mSocket.emit("nuevo_problema",object);
+                    GraphRequest request = GraphRequest.newMeRequest(
+                            AccessToken.getCurrentAccessToken(),
+                            new GraphRequest.GraphJSONObjectCallback() {
+                                @Override
+                                public void onCompleted(
+                                        JSONObject object,
+                                        GraphResponse response) {
+                                    try {
+                                        RetrofitInterface service = retrofit.create(RetrofitInterface.class);
+                                        File file = new File(PathImagen);
+                                        RequestBody imagen = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                                        MultipartBody.Part body = MultipartBody.Part.createFormData("imagen", file.getName(), imagen);
+                                        String des = eddescripcion.getText().toString();
+                                        RequestBody descripcion = RequestBody.create(MediaType.parse("multipart/form-data"), des);
+                                        RequestBody usuario = RequestBody.create(MediaType.parse("multipart/form-data"), object.getString("name"));
 
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        } catch (IOException e) {
-                                                            e.printStackTrace();
-                                                        }
+                                        Call<ResponseBody> call = service.upload(body, descripcion, usuario);
+                                        call.enqueue(new Callback<ResponseBody>() {
 
-                                                    } else {
-                                                        Toast.makeText(getApplicationContext(), "No conectado a socket", Toast.LENGTH_LONG);
-                                                    }
-                                                    Intent inte = new Intent(getApplicationContext(), MainActivity.class);
-                                                    startActivity(inte);
-                                                }
-                                            });
-                            AlertDialog alert = builder.create();
-                            alert.show();
+                                            @Override
+                                            public void onResponse(Call<ResponseBody> call, final retrofit2.Response<ResponseBody> response) {
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(agregarActivity.this);
+                                                builder.setMessage("Su problema se ha publicado con exito!")
+                                                        .setTitle("Exito!!")
+                                                        .setCancelable(false)
+                                                        .setNeutralButton("Aceptar",
+                                                                new DialogInterface.OnClickListener() {
+                                                                    public void onClick(DialogInterface dialog, int id) {
+                                                                        dialog.cancel();
 
-                        }
+                                                                        if(mSocket.connected()){
+                                                                            try {
+                                                                                JSONObject object=new JSONObject(response.body().string());
+                                                                                mSocket.emit("nuevo_problema",object);
 
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG);
-                        }
-                    });
+                                                                            } catch (JSONException e) {
+                                                                                e.printStackTrace();
+                                                                            } catch (IOException e) {
+                                                                                e.printStackTrace();
+                                                                            }
+
+                                                                        } else {
+                                                                            Toast.makeText(getApplicationContext(), "No conectado a socket", Toast.LENGTH_LONG);
+                                                                        }
+                                                                        Intent inte = new Intent(getApplicationContext(), MainActivity.class);
+                                                                        startActivity(inte);
+                                                                    }
+                                                                });
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG);
+                                            }
+                                        });
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
+                    request.executeAsync();
+
+
+
+
+
            } else {
                       Toast.makeText(getApplicationContext(),"Debe ingresar una imagen!",Toast.LENGTH_LONG).show();
                     }
@@ -172,6 +199,7 @@ public class agregarActivity extends AppCompatActivity {
         });
 
     }
+
 
 
 

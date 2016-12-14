@@ -11,9 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.facebook.login.LoginManager;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -21,6 +23,7 @@ import com.putallazmilton.agrobook2.R;
 import com.putallazmilton.agrobook2.adapters.homeAdapter;
 import com.putallazmilton.agrobook2.models.Problema;
 import com.putallazmilton.agrobook2.socket.sockets;
+import com.putallazmilton.agrobook2.views.LoginActivity;
 import com.putallazmilton.agrobook2.views.agregarActivity;
 
 
@@ -51,7 +54,16 @@ public class homeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
       View view =inflater.inflate(R.layout.fragment_home, container, false);
-
+        Button cerrarsesion=(Button) view.findViewById(R.id.btncerrarsesion);
+        cerrarsesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginManager.getInstance().logOut();
+                Intent inte=new Intent(getActivity(),LoginActivity.class);
+                inte.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(inte);
+            }
+        });
         rv= (RecyclerView) view.findViewById(R.id.recyclerviewhome);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
         FloatingActionButton fab= (FloatingActionButton) view.findViewById(R.id.floatbutton);
