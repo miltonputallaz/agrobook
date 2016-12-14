@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             sockets.getInstance().conectarSocket();
             homeFragment hf = new homeFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.activity_main,hf).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.activity_main, hf).commit();
         }
 
     }

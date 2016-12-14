@@ -31,7 +31,8 @@
                 android:layout_height="126dp"
                 android:id="@+id/imagen"
                 android:scaleType="centerCrop"
-                android:src="@drawable/paisaje"
+                    android:src="@drawable/plagas"
+
                 />
 
                 <TextView

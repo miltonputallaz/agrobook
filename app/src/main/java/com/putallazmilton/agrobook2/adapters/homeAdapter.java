@@ -45,6 +45,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
     private int resource;
     private Activity activity;
     private RequestQueue requestQueue;
+    private String url="http://192.168.1.3:8080/";
     public homeAdapter(int resource, final Activity activity) {
 
         this.resource = resource;
@@ -54,7 +55,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
 
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.GET,
-                "http://192.168.1.2:8080/problemas",
+                url+"problemas",
                 (String)null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -159,7 +160,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
         holder.descripcion.setText(problema.getDescripcion());
         holder.usuario.setText(problema.getUsuario());
         holder.id.setText(String.valueOf(problema.getId()));
-        Picasso.with(activity.getApplicationContext()).load("http://192.168.1.2:8080/images/"+problema.getId()+".jpg").into(holder.imagen);
+        Picasso.with(activity.getApplicationContext()).load(url+"images/"+problema.getId()+".jpg").into(holder.imagen);
     }
 
     @Override

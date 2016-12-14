@@ -62,7 +62,7 @@ public class agregarActivity extends AppCompatActivity {
     String PathImagen;
     private Socket mSocket;
 
-    private String url= "http://192.168.1.2:8080/";
+    private String url= "http://192.168.1.3:8080/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

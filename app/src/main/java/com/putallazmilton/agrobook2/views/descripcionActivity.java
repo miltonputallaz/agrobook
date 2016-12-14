@@ -17,6 +17,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -40,7 +43,7 @@ import static com.android.volley.Request.Method.POST;
 
 public class descripcionActivity extends AppCompatActivity {
     ArrayList<Respuesta> respuestas = new ArrayList<>();
-    private String url="http://192.168.1.2:8080/";
+    private String url="http://192.168.1.3:8080/";
 
     private Socket mSocket;
     LinearLayout ll;
@@ -102,61 +105,75 @@ public class descripcionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("descripcion",edrespuet.getText().toString());
-                    json.put("usuario","Jose");
-                    json.put("idproblema",problema.getId());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
-                JsonObjectRequest object= new JsonObjectRequest(POST,url+"respuestas",json,new Response.Listener<JSONObject>(){
+                GraphRequest request = GraphRequest.newMeRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONObject jsonface,
+                                    GraphResponse response) {
+                                JSONObject json = new JSONObject();
+                                try {
+                                    json.put("descripcion",edrespuet.getText().toString());
+                                    json.put("usuario",jsonface.getString("name"));
+                                    json.put("idproblema",problema.getId());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
 
-                    @Override
-                    public void onResponse(final JSONObject response) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(descripcionActivity.this);
-                        builder.setMessage("Su respuesta se ha publicado con exito!")
-                                .setTitle("Exito!!")
-                                .setCancelable(false)
-                                .setNeutralButton("Aceptar",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                                if (mSocket.connected()){
-                                                    mSocket.emit("nueva_respuesta",response);
-                                                }
-                                                JSONObject data= (JSONObject) response;
-                                                String usuario="";
-                                                String descripcion="";
-                                                try {
-                                                    usuario = data.getString("usuario");
-                                                    descripcion = data.getString("descripcion");
-                                                    View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
-                                                    TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
-                                                    tvusuario.setText(usuario);
-                                                    TextView tvdesc = (TextView) vi.findViewById(R.id.descripcionrespuesta);
-                                                    tvdesc.setText(descripcion);
+                                JsonObjectRequest object= new JsonObjectRequest(POST,url+"respuestas",json,new Response.Listener<JSONObject>(){
 
-                                                    ll.addView(vi);
-                                                    edrespuet.setText("");
-                                                } catch (JSONException e) {
-                                                    Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
-                                                }
+                                    @Override
+                                    public void onResponse(final JSONObject response) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(descripcionActivity.this);
+                                        builder.setMessage("Su respuesta se ha publicado con exito!")
+                                                .setTitle("Exito!!")
+                                                .setCancelable(false)
+                                                .setNeutralButton("Aceptar",
+                                                        new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int id) {
+                                                                dialog.cancel();
+                                                                if (mSocket.connected()){
+                                                                    mSocket.emit("nueva_respuesta",response);
+                                                                }
+                                                                JSONObject data= (JSONObject) response;
+                                                                String usuario="";
+                                                                String descripcion="";
+                                                                try {
+                                                                    usuario = data.getString("usuario");
+                                                                    descripcion = data.getString("descripcion");
+                                                                    View vi = getLayoutInflater().inflate(R.layout.itemdescripcion, null);
+                                                                    TextView tvusuario = (TextView) vi.findViewById(R.id.usuariorespuesta);
+                                                                    tvusuario.setText(usuario);
+                                                                    TextView tvdesc = (TextView) vi.findViewById(R.id.descripcionrespuesta);
+                                                                    tvdesc.setText(descripcion);
+
+                                                                    ll.addView(vi);
+                                                                    edrespuet.setText("");
+                                                                } catch (JSONException e) {
+                                                                    Toast.makeText(getApplicationContext(),"Error en parseo JSON",Toast.LENGTH_LONG).show();
+                                                                }
+                                                            }
+                                                        });
+                                        AlertDialog alert = builder.create();
+                                        alert.show();
+                                    }
+                                },
+                                        new Response.ErrorListener(){
+
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+
                                             }
                                         });
-                        AlertDialog alert = builder.create();
-                        alert.show();
-                    }
-                },
-                new Response.ErrorListener(){
+                                requestq.add(object);
+                            }
+                        });
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                request.executeAsync();
 
-                    }
-                });
-                requestq.add(object);
+
             }
         });
 

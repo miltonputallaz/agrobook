@@ -46,7 +46,7 @@ public class    sockets {
     public void conectarSocket(){
 
         try {
-            mSocket = IO.socket("http://192.168.1.2:8080");
+            mSocket = IO.socket("http://192.168.1.3:8080");
         } catch (URISyntaxException e) {}
         mSocket.on("agregar_respuesta",onNewAnswer);
         mSocket.on("agregar_problema", onNewProblem);
