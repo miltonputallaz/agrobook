@@ -130,8 +130,9 @@ public class agregarActivity extends AppCompatActivity {
                                         String des = eddescripcion.getText().toString();
                                         RequestBody descripcion = RequestBody.create(MediaType.parse("multipart/form-data"), des);
                                         RequestBody usuario = RequestBody.create(MediaType.parse("multipart/form-data"), object.getString("name"));
+                                        RequestBody idUsuario=RequestBody.create(MediaType.parse("multipart/form-data"),AccessToken.getCurrentAccessToken().getUserId());
 
-                                        Call<ResponseBody> call = service.upload(body, descripcion, usuario);
+                                        Call<ResponseBody> call = service.upload(body, descripcion, usuario,idUsuario);
                                         call.enqueue(new Callback<ResponseBody>() {
 
                                             @Override

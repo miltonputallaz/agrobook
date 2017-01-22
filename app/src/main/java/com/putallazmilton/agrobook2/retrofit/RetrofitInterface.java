@@ -25,7 +25,8 @@ public interface RetrofitInterface {
     Call<ResponseBody> upload(
                                 @Part MultipartBody.Part imagen,
                               @Part("descripcion") RequestBody descripcion,
-                              @Part ("usuario") RequestBody usuario
+                              @Part ("usuario") RequestBody usuario,
+                                @Part ("idUsuario") RequestBody idusuario
     );
 
 

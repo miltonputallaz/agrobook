@@ -122,7 +122,10 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
                     Problema problema = new Problema(
                             objeto.getString("descripcion"),
                             objeto.getString("usuario"),
-                            objeto.getString("_id"));
+                            objeto.getString("_id"),
+                            objeto.getString("idUsuario"));
+
+
 
 
                     problemas1.add(problema);
@@ -160,6 +163,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
         holder.descripcion.setText(problema.getDescripcion());
         holder.usuario.setText(problema.getUsuario());
         holder.id.setText(String.valueOf(problema.getId()));
+        Picasso.with(activity.getApplicationContext()).load("https://graph.facebook.com/" + problema.getIdusuario()+ "/picture?type=large").into(holder.profile);
         Picasso.with(activity.getApplicationContext()).load(url+"images/"+problema.getId()+".jpg").into(holder.imagen);
     }
 
@@ -176,6 +180,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
         private TextView descripcion;
         private TextView id;
         private ImageView imagen;
+        private ImageView profile;
 
 
         public PictureViewHolder(View itemView) {
@@ -186,6 +191,7 @@ public class homeAdapter extends RecyclerView.Adapter<homeAdapter.PictureViewHol
             descripcion= (TextView) itemView.findViewById(R.id.tvdescripcion);
             id  = (TextView) itemView.findViewById(R.id.idproblema);
             imagen =(ImageView) itemView.findViewById(R.id.imagen);
+            profile=(ImageView) itemView.findViewById(R.id.profileimage);
 
 
         }

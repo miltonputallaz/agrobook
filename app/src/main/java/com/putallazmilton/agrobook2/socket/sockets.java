@@ -103,6 +103,7 @@ public class    sockets {
                         problema.setId(data.getString("_id"));
                         problema.setDescripcion(data.getString("descripcion"));
                         problema.setUsuario(data.getString("usuario"));
+                        problema.setUsuario(data.getString("idUsuario"));
 
                         homeAdapter adapter=(homeAdapter) rv.getAdapter();
                         adapter.nuevoProblema(problema);
